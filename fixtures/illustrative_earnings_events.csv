@@ -1,0 +1,3 @@
+event_at,available_at,underlying,fiscal_period,event_type
+2025-02-21T00:00:00Z,2025-02-21T00:00:00Z,ILLUS,2025Q1,earnings_release
+2025-03-18T00:00:00Z,2025-03-18T00:00:00Z,ILLUS,2025Q2,guidance_update

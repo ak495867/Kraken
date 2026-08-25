@@ -1,0 +1,77 @@
+# Project TODO
+
+- [x] Define leakage-safe, local-first research contracts and documentation
+- [x] Implement deterministic C++ sonar, calibration, regime-risk, and integrity core
+- [x] Expose typed native APIs through pybind11
+- [x] Implement Python data ingestion, schema validation, audit logic, and CLI commands
+- [x] Add reproducible package, CMake, and build configuration
+- [x] Add deterministic unit and CLI tests with clearly labeled illustrative inputs
+- [x] Build the extension and run the full verification suite
+- [x] Preserve native validation semantics for full supplied input before Python feature filtering
+- [x] Prove future and unavailable observations are rejected consistently through the Python APIs
+- [x] Prove regime-risk analysis rejects future and unavailable observations before native feature computation
+- [x] Prove walk-forward research rejects leaky observations before evaluating any window
+- [x] Prove walk-forward research rejects future-timestamp input before evaluating any window
+- [x] Deliver installation and research-only usage guidance
+- [x] Rewrite the README in the supplied candid quantitative-research voice
+- [x] Package the finalized codebase as a downloadable ZIP archive
+- [x] Define local equity and options schemas, marine-dynamics formulas, and research-backtest integrity rules
+- [x] Implement C++ hydrodynamic drag volatility, tidal-current, cavitation, and buoyancy modules
+- [x] Expose the new native dynamics results through typed pybind11 and Python APIs
+- [x] Implement local equity-options research backtesting with availability timestamps, embargoes, and no P&L or trade instructions
+- [x] Add CLI commands, automated script entry point, tests, and clearly labeled illustrative fixtures
+- [x] Verify native builds, package distributions, deterministic tests, and documentation for the expanded toolkit
+- [x] Define and implement a local-first licensed point-in-time vendor adapter contract
+- [x] Validate corporate actions and option splits against historical price and contract records
+- [x] Create sector and underlying-universe calibration diagnostics for marine dynamics and implied-move coverage
+- [x] Add CLI commands, illustrative fixtures, deterministic tests, and documentation for the new data-integrity workflows
+- [x] Verify the expanded package and deliver the finalized codebase as a ZIP archive
+- [x] Define normalizer mappings, distribution records, and time-slice configuration contracts
+- [x] Implement provider-specific local export normalizers with strict mapped-field validation
+- [x] Validate cash dividends and special distributions against point-in-time equity records
+- [x] Implement time-sliced calibration diagnostics for marine-dynamics regime-shift analysis
+- [x] Add CLI workflows, illustrative fixtures, deterministic tests, documentation, and package verification
+- [x] Define earnings-event records, mapping-file schema, and time-slice visualization outputs
+- [x] Implement earnings-event availability validation during point-in-time backtesting
+- [x] Add an explicit snapshot-v1 licensed-vendor field-mapping file and mapping-file normalizer support
+- [x] Generate local time-slice regime-shift visualizations with CLI report generation
+- [x] Add fixtures, tests, documentation, packaging verification, and deliver the finalized full codebase ZIP
+- [x] Define focused C++ module boundaries for validation, numeric utilities, sonar, calibration, regime, and dynamics
+- [x] Split the deterministic native core into additional C++ headers and implementation files without comments
+- [x] Update the CMake target and preserve the existing pybind11 API contracts
+- [x] Rebuild, test, package, document, and archive the deeper C++ codebase
+- [x] Create and deliver a refreshed full-codebase ZIP containing the modular C++ native core
+- [x] Define the native CTest matrix, deterministic benchmark workload, and versioned configuration schema
+- [x] Implement validated versioned C++ research configuration loading and serialization
+- [x] Add CTest-native module coverage for integrity, sonar, calibration, regime, dynamics, and configuration
+- [x] Add reproducible large-history benchmark targets for sonar and marine dynamics
+- [x] Verify CTest, benchmarks, package builds, documentation, and the refreshed complete codebase
+- [x] Create and deliver a refreshed full-codebase ZIP containing the native CTest, benchmark, and versioned configuration work
+- [x] Define a schema-v2 migration contract, benchmark-result format, and performance-threshold policy
+- [x] Implement native configuration migration and canonical schema-v2 serialization
+- [x] Add compiler-aware benchmark result comparison with configurable regression thresholds
+- [x] Add CI workflow checks for CTest, Python tests, packaging, benchmarks, and performance regression enforcement
+- [x] Verify migrations, comparison tooling, CI assets, packages, documentation, and refreshed full codebase ZIP
+- [x] Define unified config-driven API, provenance manifest, calendar, vendor-plugin, and research-bundle contracts
+- [x] Make ResearchConfig drive native sonar, calibration, regime, and marine-dynamics computations
+- [x] Replace repeated eligible-history copies with validated native ranges where behavior remains compatible
+- [x] Add immutable run manifests, input and output hashing, and research-run comparison reports
+- [x] Add explicit exchange-calendar, stale-data, duplicate-snapshot, halt, and option-chain completeness controls
+- [x] Build a licensed-data acceptance harness that remains inactive without user-authorized data
+- [x] Add allocation and percentile performance instrumentation with workload-size threshold checks
+- [x] Implement versioned vendor mapping plugins with provenance and contract tests
+- [x] Create auditable research bundles containing reports, audits, config, manifests, charts, and warnings
+- [x] Remove obsolete web-template residue and preserve only Kraken-relevant project assets
+- [x] Add comprehensive tests, documentation, package verification, and refreshed full codebase archive
+- [x] Mark controlled baseline-refresh review policy and cross-platform safeguards as superseded by user direction
+- [x] Mark CI benchmark artifact upload as superseded by user direction
+- [x] Mark Windows and macOS native benchmark baselines and CI matrix checks as superseded by user direction
+- [x] Mark scheduled and manual baseline-review workflow as superseded by user direction
+- [x] Validate retained workflow assets, update documentation, and package the refreshed codebase
+- [x] Finish native copy-reduction validation across relevant C++ paths with explicit compatibility tests and benchmarks
+- [x] Add explicit copy instrumentation and compatibility coverage for calibration and regime native paths
+- [x] Attach and verify run manifests for walk-forward and remaining major report paths, including standalone-manifest comparison support
+- [x] Re-verify the repository after scaffold cleanup and confirm the final source tree contains no obsolete web-template residue
+- [x] Exclude managed-project metadata and generated logs from the final source archive
+- [x] Re-verify the final Kraken source tree is free of generated artifacts and managed metadata
+- [x] Create, integrity-test, and deliver the cleaned codebase as kraken.zip

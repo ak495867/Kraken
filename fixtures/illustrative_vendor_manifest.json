@@ -1,0 +1,16 @@
+{
+  "corporate_actions_path": "illustrative_corporate_actions.csv",
+  "dataset_id": "illustrative-pit-equity-options",
+  "distributions_path": "illustrative_distributions.csv",
+  "earnings_path": "illustrative_earnings_events.csv",
+  "equity_path": "illustrative_market_data.csv",
+  "mapping_path": "../vendor_mappings/licensed_snapshot_v1.json",
+  "normalizer_profile": "licensed_snapshot_v1",
+  "option_adjustments_path": "illustrative_option_adjustments.csv",
+  "options_path": "illustrative_option_quotes.csv",
+  "price_basis": "split_adjusted",
+  "provider": "Illustrative Licensed Export",
+  "sector": "Illustrative Sector",
+  "snapshot_as_of": "2025-04-07T00:00:00Z",
+  "underlying_universe": "Illustrative Universe"
+}

@@ -1,0 +1,7 @@
+{
+  "provider": "snapshot_v1",
+  "version": "1.0.0",
+  "fixture_kind": "local_illustrative_contract",
+  "required_equity_source_fields": ["event_time", "published_at", "settle", "shares", "rv_20d", "notional_liquidity"],
+  "required_option_source_fields": ["event_time", "published_at", "expiry", "symbol", "right", "exercise_price", "best_bid", "best_ask", "iv", "open_int", "contracts", "root"]
+}

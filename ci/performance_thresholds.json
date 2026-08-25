@@ -1,0 +1,27 @@
+{
+  "require_matching_compiler": true,
+  "defaults": {
+    "max_p50_regression_percent": 35.0,
+    "max_p95_regression_percent": 40.0,
+    "max_input_bar_copy_count": 0,
+    "max_input_bar_copy_bytes": 0
+  },
+  "workloads": {
+    "sonar_large_history": {
+      "max_p50_regression_percent": 30.0,
+      "max_p95_regression_percent": 35.0
+    },
+    "marine_dynamics_large_history": {
+      "max_p50_regression_percent": 30.0,
+      "max_p95_regression_percent": 35.0
+    },
+    "calibration_large_history": {
+      "max_p50_regression_percent": 30.0,
+      "max_p95_regression_percent": 35.0
+    },
+    "regime_large_history": {
+      "max_p50_regression_percent": 30.0,
+      "max_p95_regression_percent": 35.0
+    }
+  }
+}

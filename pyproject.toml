@@ -1,0 +1,42 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "kraken-quant"
+version = "0.1.0"
+description = "Deterministic sonar-inspired market research and regime-risk toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "ak495867" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: C++",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Information Analysis"
+]
+dependencies = ["matplotlib>=3.8"]
+
+[project.optional-dependencies]
+dev = ["build>=1.2", "twine>=5.1"]
+
+[project.scripts]
+kraken = "kraken.cli:main"
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.20"
+wheel.packages = ["src/kraken"]
+
+[tool.scikit-build.wheel.force-include]
+"vendor_plugins" = "kraken/vendor_plugins"
+
+[tool.scikit-build.cmake.define]
+CMAKE_BUILD_TYPE = "Release"

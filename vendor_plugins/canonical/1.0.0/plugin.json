@@ -1,0 +1,29 @@
+{
+  "provider": "canonical",
+  "version": "1.0.0",
+  "schema": "kraken_vendor_mapping_plugin/v1",
+  "mapping": {
+    "equity": {
+      "timestamp": "timestamp",
+      "available_at": "available_at",
+      "close": "close",
+      "volume": "volume",
+      "realized_volatility": "realized_volatility",
+      "liquidity": "liquidity"
+    },
+    "options": {
+      "timestamp": "timestamp",
+      "available_at": "available_at",
+      "expiration": "expiration",
+      "contract": "contract",
+      "option_type": "option_type",
+      "strike": "strike",
+      "bid": "bid",
+      "ask": "ask",
+      "implied_volatility": "implied_volatility",
+      "open_interest": "open_interest",
+      "volume": "volume",
+      "underlying": "underlying"
+    }
+  }
+}

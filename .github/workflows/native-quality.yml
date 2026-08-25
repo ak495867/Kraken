@@ -1,0 +1,91 @@
+name: native-quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  native-quality:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y cmake ninja-build pybind11-dev
+      - run: python -m pip install --upgrade pip build
+      - run: python -m pip install -e .
+      - run: python -m unittest discover -s tests -v
+      - run: cmake -S . -B build/native -DBUILD_TESTING=ON -DKRAKEN_BUILD_BENCHMARKS=ON
+      - run: cmake --build build/native --parallel 2
+      - run: ctest --test-dir build/native --output-on-failure
+      - run: build/native/kraken_large_history_benchmark 200000 3 9 > build/native/benchmark.csv
+      - run: python tools/compare_benchmarks.py --baseline benchmarks/baseline_gcc13_linux.csv --candidate build/native/benchmark.csv --policy ci/performance_thresholds.json --output build/native/performance_comparison.json
+      - run: python -m build --outdir dist
+      - run: python -m venv /tmp/kraken-wheel-smoke
+      - run: /tmp/kraken-wheel-smoke/bin/python -m pip install dist/*.whl
+      - run: /tmp/kraken-wheel-smoke/bin/python tools/wheel_smoke.py
+      - if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-source
+          path: dist/*.tar.gz
+
+  packaging:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2025]
+        python: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --upgrade pip build
+      - run: python -m build --wheel --outdir dist
+      - run: python -m venv .wheel-smoke
+      - if: runner.os == 'Windows'
+        run: .wheel-smoke\Scripts\python tools\install_wheel.py
+      - if: runner.os != 'Windows'
+        run: .wheel-smoke/bin/python tools/install_wheel.py
+      - if: runner.os == 'Windows'
+        run: .wheel-smoke\Scripts\python tools\wheel_smoke.py
+      - if: runner.os != 'Windows'
+        run: .wheel-smoke/bin/python tools/wheel_smoke.py
+      - if: runner.os == 'Windows'
+        run: .wheel-smoke\Scripts\python -m unittest discover -s tests -v
+      - if: runner.os != 'Windows'
+        run: .wheel-smoke/bin/python -m unittest discover -s tests -v
+      - if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-wheel-${{ matrix.os }}-${{ matrix.python }}
+          path: dist/*.whl
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [native-quality, packaging]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+      - run: python tools/check_release.py --dist dist --tag "$GITHUB_REF_NAME"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

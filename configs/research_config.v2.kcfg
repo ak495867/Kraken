@@ -1,0 +1,11 @@
+schema_version=2
+sonar_horizons=1,5,10
+minimum_points=4
+reference_minimum_points=6
+evaluation_minimum_points=4
+reference_liquidity=0
+drag_scale=1
+fast_window=5
+slow_window=20
+calibration_decay=0.25
+forecast_coverage=0.9

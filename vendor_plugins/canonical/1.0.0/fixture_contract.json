@@ -1,0 +1,7 @@
+{
+  "provider": "canonical",
+  "version": "1.0.0",
+  "fixture_kind": "local_illustrative_contract",
+  "required_equity_source_fields": ["timestamp", "available_at", "close", "volume", "realized_volatility", "liquidity"],
+  "required_option_source_fields": ["timestamp", "available_at", "expiration", "contract", "option_type", "strike", "bid", "ask", "implied_volatility", "open_interest", "volume", "underlying"]
+}

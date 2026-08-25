@@ -1,0 +1,5 @@
+benchmark,observations,iterations,samples,p50_ms,p95_ms,checksum,compiler,input_bar_copy_count,input_bar_copy_bytes,temporary_double_buffer_count,temporary_double_buffer_bytes
+sonar_large_history,200000,3,9,35.576,53.616,0.308,gcc-13.3.0,0,0,1,1599992
+marine_dynamics_large_history,200000,3,9,32.298,32.647,2.394,gcc-13.3.0,0,0,8,11199984
+calibration_large_history,200000,3,9,17.135,17.883,26.986,gcc-13.3.0,0,0,9,7359960
+regime_large_history,200000,3,9,30.352,30.645,5.545,gcc-13.3.0,0,0,10,7999952

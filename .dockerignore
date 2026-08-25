@@ -1,0 +1,13 @@
+.git
+build
+dist
+.venv
+.wheel-smoke
+__pycache__
+*.pyc
+*.so
+*.o
+*.a
+*.db
+*.jsonl
+.env

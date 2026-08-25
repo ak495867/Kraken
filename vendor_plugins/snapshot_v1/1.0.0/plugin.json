@@ -1,0 +1,29 @@
+{
+  "provider": "snapshot_v1",
+  "version": "1.0.0",
+  "schema": "kraken_vendor_mapping_plugin/v1",
+  "mapping": {
+    "equity": {
+      "timestamp": "event_time",
+      "available_at": "published_at",
+      "close": "settle",
+      "volume": "shares",
+      "realized_volatility": "rv_20d",
+      "liquidity": "notional_liquidity"
+    },
+    "options": {
+      "timestamp": "event_time",
+      "available_at": "published_at",
+      "expiration": "expiry",
+      "contract": "symbol",
+      "option_type": "right",
+      "strike": "exercise_price",
+      "bid": "best_bid",
+      "ask": "best_ask",
+      "implied_volatility": "iv",
+      "open_interest": "open_int",
+      "volume": "contracts",
+      "underlying": "root"
+    }
+  }
+}
