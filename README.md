@@ -8,7 +8,7 @@ Ever wanted to inspect market structure without turning a research notebook into
 
 Instead of pretending that a single score can predict every asset, Kraken makes the research boundary explicit. It validates what was knowable at each decision point, produces deterministic native calculations, measures empirical forecast coverage, and leaves an auditable provenance trail. Think of it as an underwater survey vessel for market structure, not an autopilot for trading.
 
-The package is authored by **[ak495867](https://github.com/ak495867)** and is provided for research and educational use.
+The package is provided for research and educational use.
 
 ---
 
