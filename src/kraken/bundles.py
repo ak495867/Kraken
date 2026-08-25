@@ -20,7 +20,7 @@ def _sha256_bytes(value: bytes) -> str:
 
 def _write_json(path: Path, value: Any) -> str:
     rendered = json.dumps(to_primitive(value), sort_keys=True, indent=2) + "\n"
-    path.write_text(rendered, encoding="utf-8")
+    path.write_bytes(rendered.encode("utf-8"))
     return _sha256_bytes(rendered.encode("utf-8"))
 
 
@@ -77,9 +77,9 @@ def create_research_bundle(
     warnings = tuple(getattr(report, "warnings", ()))
     hashes["warnings.json"] = _write_json(destination / "warnings.json", {"warnings": warnings})
     config_rendered = _canonical_config(canonical_config)
-    (destination / "research_config.kcfg").write_text(config_rendered, encoding="utf-8")
+    (destination / "research_config.kcfg").write_bytes(config_rendered.encode("utf-8"))
     hashes["research_config.kcfg"] = _sha256_bytes(config_rendered.encode("utf-8"))
-    (destination / "RESEARCH_ONLY_DISCLOSURE.md").write_text(DISCLOSURE + "\n", encoding="utf-8")
+    (destination / "RESEARCH_ONLY_DISCLOSURE.md").write_bytes((DISCLOSURE + "\n").encode("utf-8"))
     hashes["RESEARCH_ONLY_DISCLOSURE.md"] = _sha256_bytes((DISCLOSURE + "\n").encode("utf-8"))
     _copy_optional(chart_path, destination, hashes)
     _copy_optional(benchmark_context_path, destination, hashes)
