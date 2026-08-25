@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -20,11 +22,37 @@ jobs:
       - run: python -m pip install --upgrade pip build
       - run: python -m pip install -e .
       - run: python -m unittest discover -s tests -v
+      - id: baseline
+        shell: bash
+        run: |
+          base_sha="${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
+            echo "use_static=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "use_static=false" >> "$GITHUB_OUTPUT"
+            echo "sha=$base_sha" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.baseline.outputs.use_static != 'true'
+        run: git worktree add --detach ../kraken-baseline "${{ steps.baseline.outputs.sha }}"
+      - if: steps.baseline.outputs.use_static != 'true'
+        run: cmake -S ../kraken-baseline -B ../kraken-baseline/build/native -DBUILD_TESTING=OFF -DKRAKEN_BUILD_BENCHMARKS=ON
+      - if: steps.baseline.outputs.use_static != 'true'
+        run: cmake --build ../kraken-baseline/build/native --parallel 2
+      - if: steps.baseline.outputs.use_static != 'true'
+        run: python tools/stable_benchmark.py --benchmark ../kraken-baseline/build/native/kraken_large_history_benchmark --observations 200000 --iterations 3 --samples 9 --attempts 3 --output build/native/base-benchmark.csv
       - run: cmake -S . -B build/native -DBUILD_TESTING=ON -DKRAKEN_BUILD_BENCHMARKS=ON
       - run: cmake --build build/native --parallel 2
       - run: ctest --test-dir build/native --output-on-failure
       - run: python tools/stable_benchmark.py --benchmark build/native/kraken_large_history_benchmark --observations 200000 --iterations 3 --samples 9 --attempts 3 --output build/native/benchmark.csv
-      - run: python tools/compare_benchmarks.py --baseline benchmarks/baseline_gcc13_linux.csv --candidate build/native/benchmark.csv --policy ci/performance_thresholds.json --output build/native/performance_comparison.json
+      - shell: bash
+        run: |
+          baseline_path="benchmarks/baseline_gcc13_linux.csv"
+          if [ "${{ steps.baseline.outputs.use_static }}" != "true" ]; then
+            baseline_path="build/native/base-benchmark.csv"
+          fi
+          python tools/compare_benchmarks.py --baseline "$baseline_path" --candidate build/native/benchmark.csv --policy ci/performance_thresholds.json --output build/native/performance_comparison.json
+      - if: steps.baseline.outputs.use_static != 'true'
+        run: git worktree remove --force ../kraken-baseline
       - run: python -m build --outdir dist
       - run: python -m venv /tmp/kraken-wheel-smoke
       - run: /tmp/kraken-wheel-smoke/bin/python -m pip install dist/*.whl
