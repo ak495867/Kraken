@@ -23,7 +23,7 @@ jobs:
       - run: cmake -S . -B build/native -DBUILD_TESTING=ON -DKRAKEN_BUILD_BENCHMARKS=ON
       - run: cmake --build build/native --parallel 2
       - run: ctest --test-dir build/native --output-on-failure
-      - run: build/native/kraken_large_history_benchmark 200000 3 9 > build/native/benchmark.csv
+      - run: python tools/stable_benchmark.py --benchmark build/native/kraken_large_history_benchmark --observations 200000 --iterations 3 --samples 9 --attempts 3 --output build/native/benchmark.csv
       - run: python tools/compare_benchmarks.py --baseline benchmarks/baseline_gcc13_linux.csv --candidate build/native/benchmark.csv --policy ci/performance_thresholds.json --output build/native/performance_comparison.json
       - run: python -m build --outdir dist
       - run: python -m venv /tmp/kraken-wheel-smoke
