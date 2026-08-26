@@ -28,6 +28,10 @@ The package is authored by **[ak495867](https://github.com/ak495867)** and is pr
 
 ---
 
+![Architecture diagram](assets/diagram.png)
+
+---
+
 ## Rigorous Testing Methodology
 
 ### Walk-Forward Validation
