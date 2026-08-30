@@ -1,5 +1,7 @@
 # Kraken v0.1.0: Point-in-Time Market Research Engine
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ak495867/Kraken)
+
 > *"If markets are an ocean, the first rule is simple: do not pretend you can see through the fog with tomorrow’s data."*
 
 ## The Concept
