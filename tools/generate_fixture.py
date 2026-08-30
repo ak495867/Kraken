@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, timezone
 from math import sin
 from pathlib import Path
 
-
 fixtures = Path(__file__).resolve().parents[1] / "fixtures"
 destination = fixtures / "illustrative_market_data.csv"
 option_destination = fixtures / "illustrative_option_quotes.csv"
@@ -17,9 +16,15 @@ snapshot_options_destination = fixtures / "illustrative_snapshot_options.csv"
 fixtures.mkdir(parents=True, exist_ok=True)
 start = datetime(2025, 1, 2, tzinfo=timezone.utc)
 rows = ["timestamp,available_at,close,volume,realized_volatility,liquidity"]
-option_rows = ["timestamp,available_at,expiration,contract,option_type,strike,bid,ask,implied_volatility,open_interest,volume,underlying"]
-snapshot_equity_rows = ["event_time,published_at,settle,shares,rv_20d,notional_liquidity"]
-snapshot_option_rows = ["event_time,published_at,expiry,symbol,right,exercise_price,best_bid,best_ask,iv,open_int,contracts,root"]
+option_rows = [
+    "timestamp,available_at,expiration,contract,option_type,strike,bid,ask,implied_volatility,open_interest,volume,underlying"
+]
+snapshot_equity_rows = [
+    "event_time,published_at,settle,shares,rv_20d,notional_liquidity"
+]
+snapshot_option_rows = [
+    "event_time,published_at,expiry,symbol,right,exercise_price,best_bid,best_ask,iv,open_int,contracts,root"
+]
 for index in range(96):
     timestamp = start + timedelta(days=index)
     close = 100.0 + 0.22 * index + 1.3 * sin(index / 5.0)
@@ -27,8 +32,12 @@ for index in range(96):
     volatility = 0.012 + 0.002 * abs(sin(index / 9.0))
     liquidity = 2_500_000.0 + 35_000.0 * index + 70_000.0 * sin(index / 6.0)
     iso = timestamp.isoformat().replace("+00:00", "Z")
-    rows.append(f"{iso},{iso},{close:.8f},{volume:.8f},{volatility:.8f},{liquidity:.8f}")
-    snapshot_equity_rows.append(f"{iso},{iso},{close:.8f},{volume:.8f},{volatility:.8f},{liquidity:.8f}")
+    rows.append(
+        f"{iso},{iso},{close:.8f},{volume:.8f},{volatility:.8f},{liquidity:.8f}"
+    )
+    snapshot_equity_rows.append(
+        f"{iso},{iso},{close:.8f},{volume:.8f},{volatility:.8f},{liquidity:.8f}"
+    )
     expiration = (timestamp + timedelta(days=45)).isoformat().replace("+00:00", "Z")
     strike = round(close, 2)
     implied_volatility = 0.18 + 0.03 * abs(sin(index / 8.0))
@@ -36,14 +45,26 @@ for index in range(96):
     ask = bid + 0.15
     open_interest = 500.0 + 8.0 * index
     option_volume = 100.0 + 3.0 * index
-    option_rows.append(f"{iso},{iso},{expiration},ILLUS{index:03d}C,call,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS")
-    option_rows.append(f"{iso},{iso},{expiration},ILLUS{index:03d}P,put,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS")
-    snapshot_option_rows.append(f"{iso},{iso},{expiration},ILLUS{index:03d}C,call,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS")
-    snapshot_option_rows.append(f"{iso},{iso},{expiration},ILLUS{index:03d}P,put,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS")
+    option_rows.append(
+        f"{iso},{iso},{expiration},ILLUS{index:03d}C,call,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS"
+    )
+    option_rows.append(
+        f"{iso},{iso},{expiration},ILLUS{index:03d}P,put,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS"
+    )
+    snapshot_option_rows.append(
+        f"{iso},{iso},{expiration},ILLUS{index:03d}C,call,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS"
+    )
+    snapshot_option_rows.append(
+        f"{iso},{iso},{expiration},ILLUS{index:03d}P,put,{strike:.2f},{bid:.6f},{ask:.6f},{implied_volatility:.8f},{open_interest:.2f},{option_volume:.2f},ILLUS"
+    )
 destination.write_text("\n".join(rows) + "\n", encoding="utf-8")
 option_destination.write_text("\n".join(option_rows) + "\n", encoding="utf-8")
-snapshot_equity_destination.write_text("\n".join(snapshot_equity_rows) + "\n", encoding="utf-8")
-snapshot_options_destination.write_text("\n".join(snapshot_option_rows) + "\n", encoding="utf-8")
+snapshot_equity_destination.write_text(
+    "\n".join(snapshot_equity_rows) + "\n", encoding="utf-8"
+)
+snapshot_options_destination.write_text(
+    "\n".join(snapshot_option_rows) + "\n", encoding="utf-8"
+)
 effective = start + timedelta(days=40)
 available = start + timedelta(days=39)
 effective_iso = effective.isoformat().replace("+00:00", "Z")
@@ -91,6 +112,7 @@ manifest_destination.write_text(
         },
         indent=2,
         sort_keys=True,
-    ) + "\n",
+    )
+    + "\n",
     encoding="utf-8",
 )

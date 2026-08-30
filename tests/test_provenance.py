@@ -56,7 +56,10 @@ class ProvenanceTests(unittest.TestCase):
         report = run_sonar_tracker(observations, observations[-1].timestamp_ms)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "manifest.json"
-            path.write_text(json.dumps(to_primitive(report.manifest), sort_keys=True), encoding="utf-8")
+            path.write_text(
+                json.dumps(to_primitive(report.manifest), sort_keys=True),
+                encoding="utf-8",
+            )
             loaded = load_run_manifest(path)
             comparison = compare_run_manifests(report.manifest, loaded)
             self.assertEqual(loaded, report.manifest)

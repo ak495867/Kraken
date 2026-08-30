@@ -1,19 +1,28 @@
 import argparse
 import json
 
-from kraken import load_observations, load_option_quotes, run_equity_options_backtest, run_vendor_equity_options_backtest
+from kraken import (
+    load_observations,
+    load_option_quotes,
+    run_equity_options_backtest,
+    run_vendor_equity_options_backtest,
+)
 from kraken.models import to_primitive
 
 
 def parse_horizons(value: str) -> tuple[int, ...]:
     parsed = tuple(int(item.strip()) for item in value.split(",") if item.strip())
     if not parsed or any(item <= 0 for item in parsed):
-        raise argparse.ArgumentTypeError("Horizons must be comma-separated positive integers")
+        raise argparse.ArgumentTypeError(
+            "Horizons must be comma-separated positive integers"
+        )
     return parsed
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Local point-in-time equity-options calibration research backtest")
+    parser = argparse.ArgumentParser(
+        description="Local point-in-time equity-options calibration research backtest"
+    )
     parser.add_argument("--equity-input")
     parser.add_argument("--options-input")
     parser.add_argument("--manifest")
@@ -37,7 +46,9 @@ def main() -> None:
         )
     else:
         if not args.equity_input or not args.options_input:
-            parser.error("--equity-input and --options-input are required when --manifest is not supplied")
+            parser.error(
+                "--equity-input and --options-input are required when --manifest is not supplied"
+            )
         report = run_equity_options_backtest(
             load_observations(args.equity_input),
             load_option_quotes(args.options_input),

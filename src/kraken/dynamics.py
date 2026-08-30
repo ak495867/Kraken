@@ -6,7 +6,14 @@ from typing import Iterable
 from . import _core
 from .audit import as_native_bars, build_integrity_audit, eligible_observations
 from .config_runtime import resolve_research_config
-from .models import BuoyancyResilienceReport, CavitationRiskReport, DragVolatilityReport, MarineDynamicsReport, Observation, TidalCurrentReport
+from .models import (
+    BuoyancyResilienceReport,
+    CavitationRiskReport,
+    DragVolatilityReport,
+    MarineDynamicsReport,
+    Observation,
+    TidalCurrentReport,
+)
 from .provenance import create_run_manifest
 
 
@@ -80,4 +87,13 @@ def analyze_marine_dynamics(
         composite_dynamics_risk=native.composite_dynamics_risk,
         integrity=audit,
     )
-    return replace(report, manifest=create_run_manifest({"analysis": "marine_dynamics", "research_config": canonical_config}, {"observations": provided}, report, decision_cutoff_ms, warnings=report.integrity.warnings))
+    return replace(
+        report,
+        manifest=create_run_manifest(
+            {"analysis": "marine_dynamics", "research_config": canonical_config},
+            {"observations": provided},
+            report,
+            decision_cutoff_ms,
+            warnings=report.integrity.warnings,
+        ),
+    )

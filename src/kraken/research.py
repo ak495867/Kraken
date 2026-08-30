@@ -22,10 +22,14 @@ def run_walk_forward(
 ) -> WalkForwardReport:
     series = tuple(observations)
     if min(train_size, validation_size, test_size) <= 0 or embargo_size < 1:
-        raise ValueError("train_size, validation_size, and test_size must be positive and embargo_size must be at least one")
+        raise ValueError(
+            "train_size, validation_size, and test_size must be positive and embargo_size must be at least one"
+        )
     required = train_size + validation_size + test_size + 2 * embargo_size
     if len(series) < required:
-        raise ValueError("Input does not contain enough observations for one embargoed walk-forward window")
+        raise ValueError(
+            "Input does not contain enough observations for one embargoed walk-forward window"
+        )
     windows: list[WalkForwardWindow] = []
     window_id = 1
     start = 0

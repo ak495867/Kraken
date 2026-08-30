@@ -22,7 +22,10 @@ def calibrate_forecast_bands(
         raise ValueError("Calibration step must be positive")
     if max_decisions is not None and max_decisions <= 0:
         raise ValueError("Calibration max_decisions must be positive")
-    if any(series[index].timestamp_ms <= series[index - 1].timestamp_ms for index in range(1, len(series))):
+    if any(
+        series[index].timestamp_ms <= series[index - 1].timestamp_ms
+        for index in range(1, len(series))
+    ):
         raise ValueError("Calibration observations must be strictly chronological")
     minimum_history = max(max(parsed_horizons) + 5, 20)
     first_decision = minimum_history - 1
@@ -37,7 +40,12 @@ def calibrate_forecast_bands(
     widths: dict[int, list[float]] = {horizon: [] for horizon in parsed_horizons}
     for decision_index in decisions:
         cutoff = series[decision_index].available_at_ms
-        report = run_sonar_tracker(series[: decision_index + 1], cutoff, parsed_horizons, research_config=research_config)
+        report = run_sonar_tracker(
+            series[: decision_index + 1],
+            cutoff,
+            parsed_horizons,
+            research_config=research_config,
+        )
         bands = {band.horizon: band for band in report.forecast_bands}
         for horizon in parsed_horizons:
             target = series[decision_index + horizon]
@@ -52,7 +60,9 @@ def calibrate_forecast_bands(
     metrics = []
     for horizon in parsed_horizons:
         if counts[horizon] == 0:
-            raise ValueError(f"Calibration produced no valid post-cutoff outcomes for horizon {horizon}")
+            raise ValueError(
+                f"Calibration produced no valid post-cutoff outcomes for horizon {horizon}"
+            )
         metrics.append(
             ForecastCalibrationMetric(
                 horizon=horizon,
@@ -63,4 +73,6 @@ def calibrate_forecast_bands(
                 mean_interval_width=sum(widths[horizon]) / counts[horizon],
             )
         )
-    return ForecastCalibrationReport(decision_count=len(decisions), metrics=tuple(metrics))
+    return ForecastCalibrationReport(
+        decision_count=len(decisions), metrics=tuple(metrics)
+    )

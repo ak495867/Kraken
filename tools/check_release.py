@@ -29,14 +29,21 @@ def validate_sdist(path: Path) -> None:
         raise ValueError("Source distribution is missing pyproject.toml")
     if not any("vendor_plugins/" in name for name in names):
         raise ValueError("Source distribution is missing vendor plugins")
-    if any(name.endswith((".pyc", ".so", ".o", ".a")) or "/__pycache__/" in name for name in names):
+    if any(
+        name.endswith((".pyc", ".so", ".o", ".a")) or "/__pycache__/" in name
+        for name in names
+    ):
         raise ValueError("Source distribution contains generated artifacts")
 
 
 def validate_wheel(path: Path) -> None:
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
-        bad = [name for name in names if name.endswith((".pyc", ".so", ".o", ".a")) and "/_core" not in name]
+        bad = [
+            name
+            for name in names
+            if name.endswith((".pyc", ".so", ".o", ".a")) and "/_core" not in name
+        ]
         if bad:
             raise ValueError(f"Wheel contains unexpected generated artifacts: {bad}")
         if not any(name.startswith("kraken/vendor_plugins/") for name in names):
@@ -54,17 +61,29 @@ def main() -> None:
     dist = Path(args.dist).expanduser().resolve()
     version = read_version(Path(args.pyproject).expanduser().resolve())
     if args.tag and args.tag.removeprefix("v") != version:
-        raise ValueError(f"Release tag {args.tag} does not match project version {version}")
-    artifacts = sorted(path for path in dist.iterdir() if path.is_file() and (path.name.endswith(".tar.gz") or path.name.endswith(".whl")))
+        raise ValueError(
+            f"Release tag {args.tag} does not match project version {version}"
+        )
+    artifacts = sorted(
+        path
+        for path in dist.iterdir()
+        if path.is_file()
+        and (path.name.endswith(".tar.gz") or path.name.endswith(".whl"))
+    )
     sdists = [path for path in artifacts if path.name.endswith(".tar.gz")]
     wheels = [path for path in artifacts if path.name.endswith(".whl")]
     if len(sdists) != 1 or not wheels:
-        raise ValueError("Release must contain exactly one source distribution and at least one wheel")
+        raise ValueError(
+            "Release must contain exactly one source distribution and at least one wheel"
+        )
     validate_sdist(sdists[0])
     for wheel in wheels:
         validate_wheel(wheel)
     checksum_path = dist / "SHA256SUMS"
-    checksum_path.write_text("".join(f"{digest(path)}  {path.name}\n" for path in artifacts), encoding="utf-8")
+    checksum_path.write_text(
+        "".join(f"{digest(path)}  {path.name}\n" for path in artifacts),
+        encoding="utf-8",
+    )
     print(f"release-check: {version} {len(wheels)} wheels and 1 source distribution")
 
 

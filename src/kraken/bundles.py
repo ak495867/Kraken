@@ -10,7 +10,6 @@ from . import _core
 from .models import ResearchBundleReport, to_primitive
 from .provenance import verify_run_manifest
 
-
 DISCLOSURE = "Kraken is a local-first research toolkit. This bundle documents analytical inputs, safeguards, and reproducibility artifacts. It does not provide investment advice, trading instructions, order handling, portfolio allocation, or profit-and-loss claims."
 
 
@@ -30,7 +29,9 @@ def _canonical_config(value: str | dict[str, Any]) -> str:
     elif isinstance(value, dict):
         document = "".join(f"{key}={value[key]}\n" for key in sorted(value))
     else:
-        raise ValueError("Bundle configuration must be a canonical config string or a mapping")
+        raise ValueError(
+            "Bundle configuration must be a canonical config string or a mapping"
+        )
     return _core.serialize_research_config(_core.parse_research_config(document))
 
 
@@ -41,10 +42,14 @@ def _integrity_payload(report: Any) -> Any:
     windows = getattr(report, "windows", None)
     if windows is not None:
         return {"windows": tuple(item.integrity for item in windows)}
-    raise ValueError("Research bundle report must expose integrity evidence directly or through windows")
+    raise ValueError(
+        "Research bundle report must expose integrity evidence directly or through windows"
+    )
 
 
-def _copy_optional(source: str | Path | None, destination: Path, hashes: dict[str, str]) -> None:
+def _copy_optional(
+    source: str | Path | None, destination: Path, hashes: dict[str, str]
+) -> None:
     if source is None:
         return
     input_path = Path(source).expanduser().resolve()
@@ -64,7 +69,9 @@ def create_research_bundle(
 ) -> ResearchBundleReport:
     manifest = getattr(report, "manifest", None)
     if manifest is None:
-        raise ValueError("Research bundle requires a report with an immutable run manifest")
+        raise ValueError(
+            "Research bundle requires a report with an immutable run manifest"
+        )
     verify_run_manifest(manifest, report)
     destination = Path(output_directory).expanduser().resolve()
     if destination.exists() and any(destination.iterdir()):
@@ -72,15 +79,25 @@ def create_research_bundle(
     destination.mkdir(parents=True, exist_ok=True)
     hashes: dict[str, str] = {}
     hashes["report.json"] = _write_json(destination / "report.json", report)
-    hashes["run_manifest.json"] = _write_json(destination / "run_manifest.json", manifest)
-    hashes["integrity.json"] = _write_json(destination / "integrity.json", _integrity_payload(report))
+    hashes["run_manifest.json"] = _write_json(
+        destination / "run_manifest.json", manifest
+    )
+    hashes["integrity.json"] = _write_json(
+        destination / "integrity.json", _integrity_payload(report)
+    )
     warnings = tuple(getattr(report, "warnings", ()))
-    hashes["warnings.json"] = _write_json(destination / "warnings.json", {"warnings": warnings})
+    hashes["warnings.json"] = _write_json(
+        destination / "warnings.json", {"warnings": warnings}
+    )
     config_rendered = _canonical_config(canonical_config)
     (destination / "research_config.kcfg").write_bytes(config_rendered.encode("utf-8"))
     hashes["research_config.kcfg"] = _sha256_bytes(config_rendered.encode("utf-8"))
-    (destination / "RESEARCH_ONLY_DISCLOSURE.md").write_bytes((DISCLOSURE + "\n").encode("utf-8"))
-    hashes["RESEARCH_ONLY_DISCLOSURE.md"] = _sha256_bytes((DISCLOSURE + "\n").encode("utf-8"))
+    (destination / "RESEARCH_ONLY_DISCLOSURE.md").write_bytes(
+        (DISCLOSURE + "\n").encode("utf-8")
+    )
+    hashes["RESEARCH_ONLY_DISCLOSURE.md"] = _sha256_bytes(
+        (DISCLOSURE + "\n").encode("utf-8")
+    )
     _copy_optional(chart_path, destination, hashes)
     _copy_optional(benchmark_context_path, destination, hashes)
     bundle_manifest = {

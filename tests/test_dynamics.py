@@ -4,8 +4,9 @@ from pathlib import Path
 
 from kraken import analyze_marine_dynamics, load_observations
 
-
-FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "illustrative_market_data.csv"
+FIXTURE = (
+    Path(__file__).resolve().parents[1] / "fixtures" / "illustrative_market_data.csv"
+)
 
 
 class DynamicsTests(unittest.TestCase):
@@ -14,8 +15,12 @@ class DynamicsTests(unittest.TestCase):
         self.cutoff = self.observations[-1].available_at_ms
 
     def test_marine_dynamics_is_deterministic_and_bounded(self):
-        first = analyze_marine_dynamics(self.observations, self.cutoff, fast_window=5, slow_window=20)
-        second = analyze_marine_dynamics(self.observations, self.cutoff, fast_window=5, slow_window=20)
+        first = analyze_marine_dynamics(
+            self.observations, self.cutoff, fast_window=5, slow_window=20
+        )
+        second = analyze_marine_dynamics(
+            self.observations, self.cutoff, fast_window=5, slow_window=20
+        )
         self.assertEqual(first, second)
         self.assertGreaterEqual(first.drag.adjusted_volatility, 0.0)
         self.assertGreaterEqual(first.cavitation.cavitation_score, 0.0)
@@ -26,11 +31,12 @@ class DynamicsTests(unittest.TestCase):
         self.assertLessEqual(first.composite_dynamics_risk, 1.0)
 
     def test_marine_dynamics_rejects_unavailable_history(self):
-        leaky = self.observations[:-1] + (replace(self.observations[-1], available_at_ms=self.cutoff + 86_400_000),)
+        leaky = self.observations[:-1] + (
+            replace(self.observations[-1], available_at_ms=self.cutoff + 86_400_000),
+        )
         with self.assertRaisesRegex(ValueError, "unavailable at the decision cutoff"):
             analyze_marine_dynamics(leaky, self.cutoff, fast_window=5, slow_window=20)
 
 
 if __name__ == "__main__":
     unittest.main()
-

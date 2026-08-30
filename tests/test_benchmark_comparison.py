@@ -5,7 +5,6 @@ from pathlib import Path
 
 from tools.compare_benchmarks import compare_results, read_results
 
-
 POLICY = {
     "require_matching_compiler": True,
     "defaults": {
@@ -19,7 +18,15 @@ POLICY = {
 
 
 class BenchmarkComparisonTests(unittest.TestCase):
-    def write_csv(self, directory: str, name: str, p50_ms: float, p95_ms: float, compiler: str = "gcc-13.3.0", copy_count: int = 0) -> Path:
+    def write_csv(
+        self,
+        directory: str,
+        name: str,
+        p50_ms: float,
+        p95_ms: float,
+        compiler: str = "gcc-13.3.0",
+        copy_count: int = 0,
+    ) -> Path:
         path = Path(directory) / name
         fieldnames = [
             "benchmark",
@@ -67,10 +74,18 @@ class BenchmarkComparisonTests(unittest.TestCase):
 
     def test_comparison_fails_for_percentile_compiler_or_copy_regressions(self):
         with tempfile.TemporaryDirectory() as directory:
-            baseline = read_results(self.write_csv(directory, "baseline.csv", 10.0, 12.0))
+            baseline = read_results(
+                self.write_csv(directory, "baseline.csv", 10.0, 12.0)
+            )
             slow = read_results(self.write_csv(directory, "slow.csv", 14.0, 17.0))
-            other_compiler = read_results(self.write_csv(directory, "other.csv", 10.0, 12.0, "clang-18.1.0"))
-            copied = read_results(self.write_csv(directory, "copied.csv", 10.0, 12.0, copy_count=1))
+            other_compiler = read_results(
+                self.write_csv(directory, "other.csv", 10.0, 12.0, "clang-18.1.0")
+            )
+            copied = read_results(
+                self.write_csv(directory, "copied.csv", 10.0, 12.0, copy_count=1)
+            )
             self.assertFalse(compare_results(baseline, slow, POLICY)["passed"])
-            self.assertFalse(compare_results(baseline, other_compiler, POLICY)["passed"])
+            self.assertFalse(
+                compare_results(baseline, other_compiler, POLICY)["passed"]
+            )
             self.assertFalse(compare_results(baseline, copied, POLICY)["passed"])

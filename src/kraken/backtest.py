@@ -11,26 +11,51 @@ from .corporate_actions import validate_corporate_action_integrity
 from .distributions import validate_distribution_integrity
 from .dynamics import analyze_marine_dynamics
 from .earnings import validate_earnings_event_integrity
-from .models import CorporateAction, DistributionRecord, EarningsEvent, EquityOptionsBacktestReport, EquityOptionsBacktestWindow, ExchangeSession, MarketDataQualityPolicy, Observation, OptionContractAdjustment, OptionQuote
+from .models import (
+    CorporateAction,
+    DistributionRecord,
+    EarningsEvent,
+    EquityOptionsBacktestReport,
+    EquityOptionsBacktestWindow,
+    ExchangeSession,
+    MarketDataQualityPolicy,
+    Observation,
+    OptionContractAdjustment,
+    OptionQuote,
+)
 from .provenance import create_run_manifest
 from .vendor import FilePointInTimeVendorAdapter
 
 
-def _known_chain_at_cutoff(quotes: tuple[OptionQuote, ...], cutoff: int, underlying: str | None) -> tuple[OptionQuote, ...]:
-    if any(quote.timestamp_ms <= cutoff and quote.available_at_ms > cutoff for quote in quotes):
-        raise ValueError("Option input contains a quote unavailable at the decision cutoff")
+def _known_chain_at_cutoff(
+    quotes: tuple[OptionQuote, ...], cutoff: int, underlying: str | None
+) -> tuple[OptionQuote, ...]:
+    if any(
+        quote.timestamp_ms <= cutoff and quote.available_at_ms > cutoff
+        for quote in quotes
+    ):
+        raise ValueError(
+            "Option input contains a quote unavailable at the decision cutoff"
+        )
     known = tuple(
         quote
         for quote in quotes
-        if quote.timestamp_ms <= cutoff and quote.available_at_ms <= cutoff and quote.expiration_ms > cutoff and (underlying is None or quote.underlying == underlying)
+        if quote.timestamp_ms <= cutoff
+        and quote.available_at_ms <= cutoff
+        and quote.expiration_ms > cutoff
+        and (underlying is None or quote.underlying == underlying)
     )
     if not known:
-        raise ValueError("No eligible unexpired option quote is available at the decision cutoff")
+        raise ValueError(
+            "No eligible unexpired option quote is available at the decision cutoff"
+        )
     latest_timestamp = max(quote.timestamp_ms for quote in known)
     return tuple(quote for quote in known if quote.timestamp_ms == latest_timestamp)
 
 
-def _select_research_contract(chain: tuple[OptionQuote, ...], underlying_close: float, target_expiration_ms: int) -> OptionQuote:
+def _select_research_contract(
+    chain: tuple[OptionQuote, ...], underlying_close: float, target_expiration_ms: int
+) -> OptionQuote:
     return min(
         chain,
         key=lambda quote: (
@@ -75,12 +100,19 @@ def run_equity_options_backtest(
     halted = tuple(sorted(set(halted_underlyings)))
     data_quality_warnings: list[str] = []
     if min(train_size, validation_size, holding_size) <= 0 or embargo_size < 1:
-        raise ValueError("train_size, validation_size, and holding_size must be positive and embargo_size must be at least one")
-    if any(options[index].timestamp_ms < options[index - 1].timestamp_ms for index in range(1, len(options))):
+        raise ValueError(
+            "train_size, validation_size, and holding_size must be positive and embargo_size must be at least one"
+        )
+    if any(
+        options[index].timestamp_ms < options[index - 1].timestamp_ms
+        for index in range(1, len(options))
+    ):
         raise ValueError("Option quote timestamps must be non-decreasing")
     required = train_size + validation_size + holding_size + 2 * embargo_size
     if len(equity) < required:
-        raise ValueError("Equity input does not contain enough observations for one embargoed research window")
+        raise ValueError(
+            "Equity input does not contain enough observations for one embargoed research window"
+        )
     windows: list[EquityOptionsBacktestWindow] = []
     start = 0
     window_id = 1
@@ -94,12 +126,22 @@ def run_equity_options_backtest(
         history = train + validation
         evaluation = validate_post_cutoff_observations(evaluation, cutoff)
         if sessions is not None:
-            quality = validate_market_data_quality(history, options, cutoff, sessions, quality_policy, halted)
+            quality = validate_market_data_quality(
+                history, options, cutoff, sessions, quality_policy, halted
+            )
             if not quality.valid:
-                details = "; ".join(issue.message for issue in quality.issues if issue.severity == "error")
-                raise ValueError(f"Calendar and market-data quality validation failed: {details}")
+                details = "; ".join(
+                    issue.message
+                    for issue in quality.issues
+                    if issue.severity == "error"
+                )
+                raise ValueError(
+                    f"Calendar and market-data quality validation failed: {details}"
+                )
             data_quality_warnings.extend(quality.warnings)
-            data_quality_warnings.extend(issue.message for issue in quality.issues if issue.severity == "warning")
+            data_quality_warnings.extend(
+                issue.message for issue in quality.issues if issue.severity == "warning"
+            )
         corporate_integrity = validate_corporate_action_integrity(
             equity,
             options,
@@ -118,7 +160,9 @@ def run_equity_options_backtest(
             price_basis,
         )
         if not distribution_integrity.valid:
-            details = "; ".join(issue.message for issue in distribution_integrity.issues)
+            details = "; ".join(
+                issue.message for issue in distribution_integrity.issues
+            )
             raise ValueError(f"Distribution integrity validation failed: {details}")
         earnings_integrity = validate_earnings_event_integrity(earnings_records, cutoff)
         if not earnings_integrity.valid:
@@ -141,12 +185,22 @@ def run_equity_options_backtest(
             survivorship_controlled=survivorship_controlled,
         )
         chain = _known_chain_at_cutoff(options, cutoff, underlying)
-        eligible_chain = tuple(quote for quote in chain if quote.expiration_ms > evaluation[-1].timestamp_ms)
+        eligible_chain = tuple(
+            quote
+            for quote in chain
+            if quote.expiration_ms > evaluation[-1].timestamp_ms
+        )
         if not eligible_chain:
-            raise ValueError("No eligible option quote remains unexpired through the evaluation horizon")
-        contract = _select_research_contract(eligible_chain, validation[-1].close, evaluation[-1].timestamp_ms)
+            raise ValueError(
+                "No eligible option quote remains unexpired through the evaluation horizon"
+            )
+        contract = _select_research_contract(
+            eligible_chain, validation[-1].close, evaluation[-1].timestamp_ms
+        )
         realized_log_return = math.log(evaluation[-1].close / validation[-1].close)
-        implied_move = contract.implied_volatility * math.sqrt(float(holding_size) / 252.0)
+        implied_move = contract.implied_volatility * math.sqrt(
+            float(holding_size) / 252.0
+        )
         absolute_move_ratio = abs(realized_log_return) / max(implied_move, 1e-12)
         windows.append(
             EquityOptionsBacktestWindow(
@@ -189,7 +243,14 @@ def run_equity_options_backtest(
         "underlying": underlying,
         "distribution_count": len(distribution_records),
         "earnings_event_count": len(earnings_records),
-        "exchange_calendar": tuple((item.session_date, item.open_ms, item.close_ms, item.is_half_day) for item in sessions) if sessions is not None else None,
+        "exchange_calendar": (
+            tuple(
+                (item.session_date, item.open_ms, item.close_ms, item.is_half_day)
+                for item in sessions
+            )
+            if sessions is not None
+            else None
+        ),
         "market_data_quality_policy": {
             "max_snapshot_lag_ms": quality_policy.max_snapshot_lag_ms,
             "minimum_option_strikes": quality_policy.minimum_option_strikes,
@@ -207,16 +268,24 @@ def run_equity_options_backtest(
         sector=sector,
         underlying_universe=underlying_universe,
         windows=tuple(windows),
-        warnings=tuple(dict.fromkeys((
-            "This local research backtest reports forecast-band and implied-move calibration only; it does not model orders, positions, or P&L",
-            "Option quotes are admitted only when timestamp and available_at are both at or before each decision cutoff",
-            "Historical universe and survivorship controls remain user-supplied data responsibilities",
-            "Known corporate actions and option-contract split adjustments are validated at every decision cutoff",
-            "Known cash dividends and special distributions are validated at every decision cutoff",
-            "Known earnings events are validated at every decision cutoff",
-            "No explicit exchange calendar was supplied; session, stale-snapshot, halt, duplicate, and option-chain completeness controls were not evaluated" if sessions is None else "Exchange-calendar and market-data quality controls were evaluated at every decision cutoff",
-            *data_quality_warnings,
-        ))),
+        warnings=tuple(
+            dict.fromkeys(
+                (
+                    "This local research backtest reports forecast-band and implied-move calibration only; it does not model orders, positions, or P&L",
+                    "Option quotes are admitted only when timestamp and available_at are both at or before each decision cutoff",
+                    "Historical universe and survivorship controls remain user-supplied data responsibilities",
+                    "Known corporate actions and option-contract split adjustments are validated at every decision cutoff",
+                    "Known cash dividends and special distributions are validated at every decision cutoff",
+                    "Known earnings events are validated at every decision cutoff",
+                    (
+                        "No explicit exchange calendar was supplied; session, stale-snapshot, halt, duplicate, and option-chain completeness controls were not evaluated"
+                        if sessions is None
+                        else "Exchange-calendar and market-data quality controls were evaluated at every decision cutoff"
+                    ),
+                    *data_quality_warnings,
+                )
+            )
+        ),
     )
     manifest = create_run_manifest(
         configuration,
@@ -266,7 +335,10 @@ def run_vendor_equity_options_backtest(
         underlying=underlying,
     )
     manifest = create_run_manifest(
-        {"analysis": "vendor_equity_options_research_backtest", "configuration_fingerprint": report.configuration_fingerprint},
+        {
+            "analysis": "vendor_equity_options_research_backtest",
+            "configuration_fingerprint": report.configuration_fingerprint,
+        },
         {
             "equity_observations": dataset.equity,
             "option_quotes": dataset.options,

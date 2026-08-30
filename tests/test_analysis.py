@@ -6,8 +6,9 @@ from pathlib import Path
 from kraken import analyze_regime_risk, load_observations, run_sonar_tracker
 from kraken.audit import build_integrity_audit
 
-
-FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "illustrative_market_data.csv"
+FIXTURE = (
+    Path(__file__).resolve().parents[1] / "fixtures" / "illustrative_market_data.csv"
+)
 
 
 class AnalysisTests(unittest.TestCase):
@@ -24,8 +25,12 @@ class AnalysisTests(unittest.TestCase):
         self.assertTrue(first.integrity.valid)
 
     def test_regime_report_exposes_all_risk_fields(self):
-        report = analyze_regime_risk(self.observations, self.cutoff, horizons=(1, 5, 10), reference_size=64)
-        self.assertIn(report.regime, {"stable", "transitional", "stressed", "dislocated"})
+        report = analyze_regime_risk(
+            self.observations, self.cutoff, horizons=(1, 5, 10), reference_size=64
+        )
+        self.assertIn(
+            report.regime, {"stable", "transitional", "stressed", "dislocated"}
+        )
         self.assertGreaterEqual(report.confidence, 0.0)
         self.assertLessEqual(report.confidence, 1.0)
         self.assertGreaterEqual(report.uncertainty, 0.0)
@@ -49,8 +54,12 @@ class AnalysisTests(unittest.TestCase):
 
     def test_unavailable_record_is_rejected_and_flagged(self):
         last = self.observations[-1]
-        leaky = self.observations[:-1] + (replace(last, available_at_ms=last.available_at_ms + 86_400_000),)
-        audit = build_integrity_audit(leaky, self.cutoff, {"analysis": "test"}, minimum_points=4)
+        leaky = self.observations[:-1] + (
+            replace(last, available_at_ms=last.available_at_ms + 86_400_000),
+        )
+        audit = build_integrity_audit(
+            leaky, self.cutoff, {"analysis": "test"}, minimum_points=4
+        )
         self.assertFalse(audit.valid)
         self.assertEqual(audit.excluded_unavailable_count, 1)
         self.assertIn("availability_timestamp_access_prevented", audit.leakage_flags)
@@ -63,7 +72,9 @@ class AnalysisTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "after the decision cutoff"):
             analyze_regime_risk(self.observations, earlier_cutoff, horizons=(1, 5, 10))
         last = self.observations[-1]
-        leaky = self.observations[:-1] + (replace(last, available_at_ms=last.available_at_ms + 86_400_000),)
+        leaky = self.observations[:-1] + (
+            replace(last, available_at_ms=last.available_at_ms + 86_400_000),
+        )
         with self.assertRaisesRegex(ValueError, "unavailable at the decision cutoff"):
             analyze_regime_risk(leaky, self.cutoff, horizons=(1, 5, 10))
 

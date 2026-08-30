@@ -6,7 +6,6 @@ import statistics
 import subprocess
 from pathlib import Path
 
-
 REQUIRED_COLUMNS = (
     "benchmark",
     "observations",
@@ -34,14 +33,21 @@ def read_csv(path: Path) -> dict[str, dict[str, str]]:
     return rows
 
 
-def stable_benchmark(executable: str, observations: int, iterations: int, samples: int, attempts: int) -> list[dict[str, str]]:
+def stable_benchmark(
+    executable: str, observations: int, iterations: int, samples: int, attempts: int
+) -> list[dict[str, str]]:
     if observations < 32 or iterations < 1 or samples < 3 or attempts < 3:
         raise ValueError("Benchmark dimensions and attempts are invalid")
     results: list[dict[str, dict[str, str]]] = []
     for _ in range(attempts):
         temporary = Path.cwd() / ".kraken-benchmark.csv"
         with temporary.open("w", encoding="utf-8") as output:
-            subprocess.run([executable, str(observations), str(iterations), str(samples)], check=True, stdout=output, text=True)
+            subprocess.run(
+                [executable, str(observations), str(iterations), str(samples)],
+                check=True,
+                stdout=output,
+                text=True,
+            )
         results.append(read_csv(temporary))
         temporary.unlink()
     keys = set(results[0])
@@ -60,7 +66,9 @@ def stable_benchmark(executable: str, observations: int, iterations: int, sample
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the Kraken native benchmark repeatedly and aggregate stable median timings")
+    parser = argparse.ArgumentParser(
+        description="Run the Kraken native benchmark repeatedly and aggregate stable median timings"
+    )
     parser.add_argument("--benchmark", required=True)
     parser.add_argument("--observations", type=int, default=200000)
     parser.add_argument("--iterations", type=int, default=3)
@@ -68,7 +76,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--attempts", type=int, default=3)
     parser.add_argument("--output", required=True)
     args = parser.parse_args(argv)
-    rows = stable_benchmark(args.benchmark, args.observations, args.iterations, args.samples, args.attempts)
+    rows = stable_benchmark(
+        args.benchmark, args.observations, args.iterations, args.samples, args.attempts
+    )
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
     with destination.open("w", encoding="utf-8", newline="") as handle:

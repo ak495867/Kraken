@@ -7,7 +7,6 @@ from pathlib import Path
 from kraken import load_observations, load_option_quotes, run_equity_options_backtest
 from kraken.bundles import create_research_bundle
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -50,10 +49,18 @@ class ResearchBundleTests(unittest.TestCase):
             self.assertIn("integrity.json", bundle.files)
             self.assertIn("research_config.kcfg", bundle.files)
             self.assertIn("RESEARCH_ONLY_DISCLOSURE.md", bundle.files)
-            manifest = json.loads((output / "bundle_manifest.json").read_text(encoding="utf-8"))
+            manifest = json.loads(
+                (output / "bundle_manifest.json").read_text(encoding="utf-8")
+            )
             self.assertEqual(manifest["run_id"], self.report.manifest.run_id)
-            self.assertEqual(manifest["run_manifest_sha256"], hashlib.sha256((output / "run_manifest.json").read_bytes()).hexdigest())
-            self.assertIn("does not provide investment advice", (output / "RESEARCH_ONLY_DISCLOSURE.md").read_text(encoding="utf-8"))
+            self.assertEqual(
+                manifest["run_manifest_sha256"],
+                hashlib.sha256((output / "run_manifest.json").read_bytes()).hexdigest(),
+            )
+            self.assertIn(
+                "does not provide investment advice",
+                (output / "RESEARCH_ONLY_DISCLOSURE.md").read_text(encoding="utf-8"),
+            )
 
     def test_bundle_rejects_incomplete_configuration(self):
         with tempfile.TemporaryDirectory() as directory:
